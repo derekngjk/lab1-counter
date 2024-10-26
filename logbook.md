@@ -40,7 +40,7 @@ We now want the counter to stop counting for 3 cycles once the counter reaches 0
 
 This gives the following waveform. Note that because we use pause_cycles - 1, we only set en to 0 for two cycles, not three. But because after en goes to 1, there is a 1 cycle delay before we evaluate the counter to increment again, so overall the counter stays at 0x9 for three cycles, as intended.
 
-![Pausing at 9 waveform](images/[task1]counter_tb_pauseat9.png)
+![Pausing at 9 waveform](images/[task1]counter_vcd_wave_pauseat9.png)
 
 ## Challenge 2
 
