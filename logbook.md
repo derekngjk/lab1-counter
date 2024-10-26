@@ -117,3 +117,20 @@ This gives the following output. The counter increments by 1 only when we press 
 
 ![single step 7 seg output: 0000](images/[task3]single_step_output1.jpg)
 ![single step 7 seg output: 0001](images/[task3]single_step_output2.jpg)
+
+# Task 4
+
+For the final task we want to create a top level module that has two subcomponents: the counter module, and a second module which takes in an 8-bit binary number, and converts it into three BCD digits. Example: if the input is 1010 1101, i.e. 0xAD, which has unsigned value 173, the converter will output 0001 0111 0011, which correspondings to digit 1, 7, 3. The main idea is that we want to increment the count as per normal, but instead of just sending the base-16 digits to vbuddy to display on the 7 seg display, we want to first convert it into BCD format, so using the above example, for decimal 173, when we get 0000 1010 1101, instead of displaying 0AD on the 7 segment display, we want to first pass it through the bcd converter so that we display 0001 0111 0011 instead, i.e. 173 on the 7 segment display.
+
+We do this by the following verilog implementation. We use the counter module as per normal, then pass the output of the counter to the input of bin2bcd, then take the bin2bcd output as the overall output. The bin2bcd uses the '>= 5? add 3' algorithm (see lecture 4 slides). Essentially, given the 8 bit hexadecimal input, we just want to left shift the input one bit at a time, shifting the bits into the result. However, at every iteration, before we shift, we first check the digits in the bcd result. If any digit is more than or equal to 5, then after we right shift, it will be at least 10 (not allowed). Hence, before we shift, if the digit is more than or equal to 5, we add 3, so that it is at least 8. Hence, after we left shift, it will be at least 16, hence, we overflow the excess into the next bcd digit. Repeat until we have shifted all 8 bits of the input into the result.
+
+![top level module .sv implementation](images/[task4]top_sv.png)
+
+The C++ test bench interface is very simple. The count is just being incremented as per normal, just that the output is bcd rather than hex. But we still send the digits to the 7 seg display the same way, using the vbdHex function.
+
+![top test bench](images/[task4]top_tb.png)
+
+This gives the following output. For instance, after reaching 009, it counts up to 00A, but instead of displaying 00A, we display 010.
+
+![bcd output 009](images/[task4]bcd_output1.jpg)
+![bcd output 010](images/[task4]bcd_output2.jpg)
