@@ -55,3 +55,37 @@ We test the async reset using the following testbench. See comments for details 
 This gives us the following waveform. As expected, after we reset the count to 0, the count stays at 0 for 1.5 periods of the clk cycle, before going back to 1.
 
 ![Async reset wave](images/[task1]async_reset_gtk.png)
+
+# Task 2
+
+We now want to send the count value to the vbuddy for display on the 7 seg display. We do this by using the following code, where vbdHex sends the value that we want to display, and tells vbuddy to display it on the corresponding digit.
+
+![Testbench code to send digits to vbuddy](images/[task2]tb_vbdhex.png)
+
+This gives us the output on the vbuddy 7 seg display:
+
+![vbuddy 7 segment display](images/[task2]vbuddy_7seg_count.jpg)
+
+Next, we want to use the rotary encode push switch to control the en signal. We do this by simply including the following code. Basically at the end of each cycle, we simply read the value of vbdFlag which is either 0 or 1. Then we set the en value to be the value of the flag, such that when the flag is 0, we cause it to stop counting.
+
+```
+top -> en = vbdFlag();
+```
+
+Next we want to plot the values on the screen using the function vbdPlot. See comments for an explanation of how the function works.
+
+![vbdplot code](images/[task2]tb_vbdplot.png)
+
+This gives us the following output on the vbuddy. Note that the portion in the middle is where the rotary switch was pushed causing the flag, and hence enable, to turn off, causing the counter to stay constant for that period until enable is enabled again.
+
+![vbdplot output](images/[task2]vbdplot.jpg)
+
+## Challenge
+
+Similarly, we still want top -> en to be controlled by the value of the vbd flag. However, we want the counter to behave such that it counts up if en = 1, and counts down if en = 0. This is implemented as follows. See comments for details.
+
+![counting up and down sv implementation](images/[task2]count_up_down_sv.png)
+
+This gives the following result when plotted and the vbd flag is varied:
+
+![counting up and down vbdplot](images/[task2]count_up_down_output.jpg)
