@@ -89,3 +89,31 @@ Similarly, we still want top -> en to be controlled by the value of the vbd flag
 This gives the following result when plotted and the vbd flag is varied:
 
 ![counting up and down vbdplot](images/[task2]count_up_down_output.jpg)
+
+# Task 3
+
+## Part 1
+
+First we change the implementation of counter.sv such that it is loadable. Whenever the control input ld is high, we set counter to the value v passed in. Otherwise we increment counter by 1. Rst still takes precedence, so if rst is 1, we set the count value to 0 regardless of ld.
+
+By default, the vbd flag stores either 0 or 1, and this can be toggled by pressing on the rotary encoder switch. However, we can use vbdSetMode(1) to change it to one-shot behaviour, which means that whenever the rotary encoder switch is pressed, the flag becomes 1 until it is read. Once it is read (using the vbdFlag function), the flag will be reset to a value of 0.
+
+We now want to modify the implementation of the counter such that pressing the switch forces the counter to preset to the vbuddy's vbdValue. We do this by passing in vbdFlag and vbdValue as the input signals ld and v respectively every cycle. So that every cycle, if we happened to press the rotary switch, the ld signal will be set to 1, and so the top -> count will be set to the vbdValue one cycle later. Additionally, after we perform vbdFlag(), it will auto set the vbd flag back to 0, such that on the next cycle onwards the counter will continue incrementing as per normal, until we press the rotary switch again. This is summed up in the following code:
+
+![testbench used to interface the counter.sv with the vbuddy control signals](images/[task3]counter_preload_tb.png])
+
+This gives the following result. Note: during the simulation, the rotary switch was rotated and pressed several times, so that the counter was preloaded to the vbdvalue whenever the switch was pressed, before continuing to count upwards.
+
+![vbuddy graph output](images/[task3]counter_preload_vbd.jpg)
+
+## Part 2
+
+Next, we want to modify counter.sv such that we increment the counter only when we press the switch, otherwise if we do not press the switch, the count value should stay constant. We do this by modifying counter.sv to only enter the always_ff block whenever we see a rising edge of ld, rather than rising edge of clk. We then interface the counter device with vbuddy by passing in the vbuddy's vbdflag as the ld signal. So that in one shot mode, whenever we press the switch, we send a rising edge of ld to the counter, so the counter increments by 1. After reading the vbdFlag value, the switch goes back to 0 and so ld is 0 and the counter does not enter the block anymore, until we press the switch again. The system verilog implementation, as well as the C++ code used to interface the counter with the vbuddy is shown below:
+
+![single step .sv implementation](images/[task3]single_step_sv.png)
+![single step tb interface](images/[task3]single_step_tb.png)
+
+This gives the following output. The counter increments by 1 only when we press the switch.
+
+![single step 7 seg output: 0000](images/[task3]single_step_output1.jpg)
+![single step 7 seg output: 0001](images/[task3]single_step_output2.jpg)
